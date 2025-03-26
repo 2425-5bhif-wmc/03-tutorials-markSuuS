@@ -21,18 +21,58 @@ public class OfficeHour {
     private Teacher teacher;
 
     @Column(name = "OH_DAY")
-    @NotNull
     private DayOfWeek day;
 
-    @Column(name = "OH_START_UNIT")
-    @PositiveOrZero
-    private int startUnit;
-
-    @Column(name = "OH_END_UNIT")
-    @PositiveOrZero
-    private int endUnit;
+    @Column(name = "OH_UNIT")
+    private Integer unit;
 
     @Column(name = "OH_ROOM")
-    @NotNull
     private String room;
+
+    @Column(name = "OH_BY_APPOINTMENT")
+    private boolean byAppointment;
+
+    public Long getId() {
+        return id;
+    }
+
+    public Teacher getTeacher() {
+        return teacher;
+    }
+
+    public void setTeacher(Teacher teacher) {
+        this.teacher = teacher;
+    }
+
+    public DayOfWeek getDay() {
+        return day;
+    }
+
+    public void setDay(DayOfWeek day) {
+        this.day = day;
+    }
+
+    public int getUnit() {
+        return unit;
+    }
+
+    public void setUnit(int unit) {
+        this.unit = unit;
+    }
+
+    public String getRoom() {
+        return room;
+    }
+
+    public void setRoom(String room) {
+        this.room = room;
+    }
+
+    public boolean isByAppointment() {
+        return byAppointment;
+    }
+
+    public void setByAppointment(boolean byAppointment) {
+        this.byAppointment = byAppointment;
+    }
 }

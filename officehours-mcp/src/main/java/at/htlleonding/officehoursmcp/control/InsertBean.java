@@ -1,0 +1,66 @@
+package at.htlleonding.officehoursmcp.control;
+
+import at.htlleonding.officehoursmcp.entity.OfficeHour;
+import at.htlleonding.officehoursmcp.entity.Teacher;
+import at.htlleonding.officehoursmcp.parser.DayOfWeekParser;
+import at.htlleonding.officehoursmcp.repository.OfficeHourRepository;
+import at.htlleonding.officehoursmcp.repository.TeacherRepository;
+import io.quarkus.logging.Log;
+import io.quarkus.runtime.StartupEvent;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.Observes;
+import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+
+@ApplicationScoped
+public class InsertBean {
+    @Inject
+    TeacherRepository teacherRepository;
+
+    @Inject
+    OfficeHourRepository officeHourRepository;
+
+    @Inject
+    DayOfWeekParser dayOfWeekParser;
+
+    @Transactional
+    void readCsvAndInsert(@Observes StartupEvent event) {
+        try(InputStream stream = getClass().getClassLoader().getResourceAsStream("htlleonding-officehours-24-25.csv")) {
+            String[] content = new String(stream.readAllBytes(), StandardCharsets.UTF_8).split("\n");
+
+            for(int i = 1; i < Arrays.stream(content).count(); i++) {
+                String[] parts = content[i].split("\t");
+
+                Teacher teacher = new Teacher();
+                teacher.setFirstName(parts[0].split(" ")[0]);
+                teacher.setLastName(parts[0].split(" ")[1]);
+                teacherRepository.persist(teacher);
+
+                OfficeHour officeHour = new OfficeHour();
+                officeHour.setTeacher(teacher);
+
+                if(parts[1].toLowerCase().contains("vereinbarung")) {
+                    officeHour.setByAppointment(true);
+                } else {
+                    officeHour.setByAppointment(false);
+                    officeHour.setDay(dayOfWeekParser.parse(parts[1]));
+                    officeHour.setUnit(Integer.parseInt(parts[3].split("\\.")[0]));
+
+                    if(Arrays.stream(parts).count() >= 7){
+                        officeHour.setRoom(parts[6]);
+                    }
+                }
+
+                officeHourRepository.persist(officeHour);
+            }
+        } catch (IOException e) {
+            Log.errorf("Error reading csv-file");
+            throw new RuntimeException(e);
+        }
+    }
+}
