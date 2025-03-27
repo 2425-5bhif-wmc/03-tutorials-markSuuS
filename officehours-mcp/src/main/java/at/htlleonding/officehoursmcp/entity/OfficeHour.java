@@ -75,4 +75,16 @@ public class OfficeHour {
     public void setByAppointment(boolean byAppointment) {
         this.byAppointment = byAppointment;
     }
+
+    @Override
+    public String toString() {
+        return "OfficeHour{" +
+                "id=" + id +
+                ", teacher=" + teacher +
+                ", day=" + day +
+                ", unit=" + unit +
+                ", room='" + room + '\'' +
+                ", byAppointment=" + byAppointment +
+                '}';
+    }
 }

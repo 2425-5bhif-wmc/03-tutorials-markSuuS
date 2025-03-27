@@ -34,4 +34,17 @@ public class Teacher {
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
+
+    public String getFullName() {
+        return firstName + " " + lastName;
+    }
+
+    @Override
+    public String toString() {
+        return "Teacher{" +
+                "id=" + id +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                '}';
+    }
 }

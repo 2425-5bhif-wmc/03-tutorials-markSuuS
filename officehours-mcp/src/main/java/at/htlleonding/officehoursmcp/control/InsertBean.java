@@ -37,14 +37,14 @@ public class InsertBean {
                 String[] parts = content[i].split("\t");
 
                 Teacher teacher = new Teacher();
-                teacher.setFirstName(parts[0].split(" ")[0]);
-                teacher.setLastName(parts[0].split(" ")[1]);
+                teacher.setFirstName(parts[0].split(" ")[0].trim());
+                teacher.setLastName(parts[0].split(" ")[1].trim());
                 teacherRepository.persist(teacher);
 
                 OfficeHour officeHour = new OfficeHour();
                 officeHour.setTeacher(teacher);
 
-                if(parts[1].toLowerCase().contains("vereinbarung")) {
+                if(parts[1].trim().toLowerCase().contains("vereinbarung")) {
                     officeHour.setByAppointment(true);
                 } else {
                     officeHour.setByAppointment(false);
