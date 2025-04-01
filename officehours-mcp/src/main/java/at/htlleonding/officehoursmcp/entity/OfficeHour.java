@@ -1,9 +1,7 @@
 package at.htlleonding.officehoursmcp.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PositiveOrZero;
 
 import java.time.DayOfWeek;
 

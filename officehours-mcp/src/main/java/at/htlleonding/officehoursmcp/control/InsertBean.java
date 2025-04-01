@@ -5,7 +5,6 @@ import at.htlleonding.officehoursmcp.entity.Teacher;
 import at.htlleonding.officehoursmcp.parser.DayOfWeekParser;
 import at.htlleonding.officehoursmcp.repository.OfficeHourRepository;
 import at.htlleonding.officehoursmcp.repository.TeacherRepository;
-import io.quarkus.arc.profile.IfBuildProfile;
 import io.quarkus.logging.Log;
 import io.quarkus.runtime.StartupEvent;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -14,7 +13,6 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
