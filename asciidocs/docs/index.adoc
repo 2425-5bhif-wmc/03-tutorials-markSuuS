@@ -1,1 +1,29 @@
 = MCP Server in Quarkus
+:toc:
+ifndef::imagesdir[:imagesdir: images]
+:icons: font
+:experimental:
+:sectnums:
+:toclevels: 5
+:experimental:
+
+== Einführung
+
+Anthropic hat ein neues offenes Protokoll namens Model Context Protocol (MCP) vorgestellt. Die Idee dahinter: KI-Assistenten sollen viel einfacher auf externe Datenquellen oder sogar komplette Apps zugreifen können – und zwar sicher, flexibel und effizient.
+Mit MCP können Entwickler entweder ihre Daten für KI-Systeme „bereitstellen“ oder Tools bauen, die diese Daten über standardisierte Schnittstellen abrufen.
+Anthropic's Claude AI ist dabei das erste LLM, dass die Integration von MCP-Servern in deren Chatbot erlaubt.
+Ein MCP-Server kann unter anderem auch in Quarkus oder Spring Boot implementiert werden.
+
+image::mcp-architecture.png[]
+
+
+== Glossar
+
+* *LLM*: Large Language Model
+** KI-Modell, das Sprache versteht und generiert
+** z.B. für Chatbots, Textübersetzungen oder Code-Vervollständigung
+** Beispiele: ChatGPT, Claude, Gemini.
+* *Anthropic*
+** US-amerikanisches KI-Unternehmen, 2021 von ehemaligen OpenAI-Mitarbeitern gegründet
+* *Claude AI*
+** von Anthropic entwickelter KI-Chatbot
