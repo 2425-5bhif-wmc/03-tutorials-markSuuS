@@ -1,4 +1,1 @@
-= Index page demo
-ifndef::imagesdir[:imagesdir: images]
-
-image::img.png[]
+= MCP Server in Quarkus
