@@ -1,4 +1,4 @@
-= Index page
+= Index page demo
 ifndef::imagesdir[:imagesdir: images]
 
 image::img.png[]
