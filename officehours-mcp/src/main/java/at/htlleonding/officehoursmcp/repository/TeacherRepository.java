@@ -16,8 +16,12 @@ public class TeacherRepository implements PanacheRepository<Teacher> {
     JPAStreamer jpaStreamer;
 
     public String getAllTeachersAsString() {
-        return jpaStreamer.stream(Teacher.class)
+        String teachers = jpaStreamer.stream(Teacher.class)
                 .map(Teacher::getFullName)
                 .collect(Collectors.joining(", "));
+
+        return teachers.isEmpty()
+                ? "Keine Lehrer in der Datenbank gefunden."
+                : teachers;
     }
 }

@@ -22,4 +22,12 @@ public class OfficeHourRepository implements PanacheRepository<OfficeHour> {
                 .map(OfficeHour::toString)
                 .collect(Collectors.joining(", "));
     }
+
+    public String getTeachersByRoom(String room) {
+        String finalRoom = room.toLowerCase().trim();
+        return jpaStreamer.stream(OfficeHour.class)
+                .filter(oh -> oh.getRoom() != null && oh.getRoom().toLowerCase().contains(finalRoom))
+                .map(oh -> oh.getTeacher().toString())
+                .collect(Collectors.joining(", "));
+    }
 }
