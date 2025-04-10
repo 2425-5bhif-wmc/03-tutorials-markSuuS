@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.20">
 <link rel="icon" type="image/png" href="themes/favicon.png">
-<title>MCP Server in Quarkus</title>
+<title>MCP-Server in Quarkus</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /*! Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
@@ -435,6 +435,120 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <style>
+pre.rouge table td { padding: 5px; }
+pre.rouge table pre { margin: 0; }
+pre.rouge, pre.rouge .w {
+  color: #24292f;
+  background-color: #f6f8fa;
+}
+pre.rouge .k, pre.rouge .kd, pre.rouge .kn, pre.rouge .kp, pre.rouge .kr, pre.rouge .kt, pre.rouge .kv {
+  color: #cf222e;
+}
+pre.rouge .gr {
+  color: #f6f8fa;
+}
+pre.rouge .gd {
+  color: #82071e;
+  background-color: #ffebe9;
+}
+pre.rouge .nb {
+  color: #953800;
+}
+pre.rouge .nc {
+  color: #953800;
+}
+pre.rouge .no {
+  color: #953800;
+}
+pre.rouge .nn {
+  color: #953800;
+}
+pre.rouge .sr {
+  color: #116329;
+}
+pre.rouge .na {
+  color: #116329;
+}
+pre.rouge .nt {
+  color: #116329;
+}
+pre.rouge .gi {
+  color: #116329;
+  background-color: #dafbe1;
+}
+pre.rouge .kc {
+  color: #0550ae;
+}
+pre.rouge .l, pre.rouge .ld, pre.rouge .m, pre.rouge .mb, pre.rouge .mf, pre.rouge .mh, pre.rouge .mi, pre.rouge .il, pre.rouge .mo, pre.rouge .mx {
+  color: #0550ae;
+}
+pre.rouge .sb {
+  color: #0550ae;
+}
+pre.rouge .bp {
+  color: #0550ae;
+}
+pre.rouge .ne {
+  color: #0550ae;
+}
+pre.rouge .nl {
+  color: #0550ae;
+}
+pre.rouge .py {
+  color: #0550ae;
+}
+pre.rouge .nv, pre.rouge .vc, pre.rouge .vg, pre.rouge .vi, pre.rouge .vm {
+  color: #0550ae;
+}
+pre.rouge .o, pre.rouge .ow {
+  color: #0550ae;
+}
+pre.rouge .gh {
+  color: #0550ae;
+  font-weight: bold;
+}
+pre.rouge .gu {
+  color: #0550ae;
+  font-weight: bold;
+}
+pre.rouge .s, pre.rouge .sa, pre.rouge .sc, pre.rouge .dl, pre.rouge .sd, pre.rouge .s2, pre.rouge .se, pre.rouge .sh, pre.rouge .sx, pre.rouge .s1, pre.rouge .ss {
+  color: #0a3069;
+}
+pre.rouge .nd {
+  color: #8250df;
+}
+pre.rouge .nf, pre.rouge .fm {
+  color: #8250df;
+}
+pre.rouge .err {
+  color: #f6f8fa;
+  background-color: #82071e;
+}
+pre.rouge .c, pre.rouge .ch, pre.rouge .cd, pre.rouge .cm, pre.rouge .cp, pre.rouge .cpf, pre.rouge .c1, pre.rouge .cs {
+  color: #6e7781;
+}
+pre.rouge .gl {
+  color: #6e7781;
+}
+pre.rouge .gt {
+  color: #6e7781;
+}
+pre.rouge .ni {
+  color: #24292f;
+}
+pre.rouge .si {
+  color: #24292f;
+}
+pre.rouge .ge {
+  color: #24292f;
+  font-style: italic;
+}
+pre.rouge .gs {
+  color: #24292f;
+  font-weight: bold;
+}
+</style>
+<style>
     pre.rouge .hll {
         background-color: #ffc;
         display: block;
@@ -446,12 +560,26 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </head>
 <body class="article toc2 toc-left">
 <div id="header">
-<h1>MCP Server in Quarkus</h1>
+<h1>MCP-Server in Quarkus</h1>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
 <li><a href="#_einführung">1. Einführung</a></li>
-<li><a href="#_glossar">2. Glossar</a></li>
+<li><a href="#_wie_funktioniert_mcp">2. Wie funktioniert MCP?</a></li>
+<li><a href="#_implementierung_mit_quarkus">3. Implementierung mit Quarkus</a>
+<ul class="sectlevel2">
+<li><a href="#_motivation">3.1. Motivation</a></li>
+<li><a href="#_voraussetzungen">3.2. Voraussetzungen</a></li>
+<li><a href="#_basisprojekt">3.3. Basisprojekt</a></li>
+<li><a href="#_maven_dependency">3.4. Maven-Dependency</a></li>
+<li><a href="#_implementierung_der_tools">3.5. Implementierung der Tools</a></li>
+<li><a href="#_claude_ai_mit_mcp_server_verbinden_stdio">3.6. Claude AI mit MCP-Server verbinden (STDIO)</a></li>
+<li><a href="#_claude_ai_mit_mcp_server_verbinden_sse">3.7. Claude AI mit MCP-Server verbinden (SSE)</a></li>
+<li><a href="#_wissen_benutzen">3.8. Wissen benutzen</a></li>
+</ul>
+</li>
+<li><a href="#_mcp_server_deployen">4. MCP-Server deployen</a></li>
+<li><a href="#_glossar">5. Glossar</a></li>
 </ul>
 </div>
 </div>
@@ -467,13 +595,402 @@ Ein MCP-Server kann unter anderem auch in Quarkus oder Spring Boot implementiert
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="images/mcp-architecture.png" alt="mcp architecture">
+<img src="images/mcp.png" alt="mcp">
 </div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_glossar"><a class="anchor" href="#_glossar"></a>2. Glossar</h2>
+<h2 id="_wie_funktioniert_mcp"><a class="anchor" href="#_wie_funktioniert_mcp"></a>2. Wie funktioniert MCP?</h2>
+<div class="sectionbody">
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Die Grundlage aller Datenbestände bildet eine zentrale Datenbank.</p>
+</li>
+<li>
+<p>Eine spezialisierte Anwendung dient als Schnittstelle: Sie verfügt einerseits über Zugriff auf diese Datenbank und stellt andererseits die darin enthaltenen Informationen über das MCP-Protokoll zur Verfügung.</p>
+</li>
+<li>
+<p>Der Nutzer interagiert über einen LLM-Client (z.B. Claude AI). Das LLM hat Zugriff auf die verschiedenen MCP-Interfaces (die sogennanten Tools) der Anwendungen und identifiziert anhand der gestellten Anfrage das am besten geeignete Interface.</p>
+</li>
+<li>
+<p>Anschließend stellt es eine Abfrage an dieses Tool – gegebenenfalls unter Angabe von Parametern.</p>
+</li>
+<li>
+<p>Je nach implementierter Logik liefert das angesprochene MCP-Interface die angeforderten Daten an den LLM-Client zurück.</p>
+</li>
+<li>
+<p>Auf Basis dieser Daten generiert das LLM eine passende Antwort.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Das MCP-Protokoll basiert auf <code>JSON-RPC</code>. Die Kommunikation kann dabei auf zwei Arten erfolgen:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>STDIO (Standard Input/Output)</strong>: Der MCP-Client nutzt die STDIO-Konsole des MCP-Servers zur Übertragung der <code>JSON-RPC</code>-Anfragen.</p>
+<div class="ulist">
+<ul>
+<li>
+<p>eher für den Entwicklungsprozess geeignet</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>SSE (Server-Sent Events)</strong>: Der MCP-Client kommuniziert über ein Webinterface mit dem Server und sendet die <code>JSON-RPC</code>-Aufrufe darüber.</p>
+<div class="ulist">
+<ul>
+<li>
+<p>für Produktivbetrieb geeignet</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/mcp-stack.png" alt="mcp stack">
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_implementierung_mit_quarkus"><a class="anchor" href="#_implementierung_mit_quarkus"></a>3. Implementierung mit Quarkus</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_motivation"><a class="anchor" href="#_motivation"></a>3.1. Motivation</h3>
+<div class="paragraph">
+<p>Es soll ein MCP-Server gebaut werden, welcher Auskunft über die Sprechstunden der Lehrerinnen und Lehrer der HTL Leonding geben kann.
+Als Datenbasis wird die Sprechstundenliste als CSV-Datei von <a href="https://mese.webuntis.com/timetable-contact-hours" class="bare">https://mese.webuntis.com/timetable-contact-hours</a> genommen.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_voraussetzungen"><a class="anchor" href="#_voraussetzungen"></a>3.2. Voraussetzungen</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Java-IDE wie IntelliJ IDEA von großem Vorteil</p>
+</li>
+<li>
+<p><a href="https://sdkman.io/sdks#maven">Maven 3.9.9</a> oder Maven-Wrapper</p>
+</li>
+<li>
+<p><a href="https://sdkman.io/jdks#tem">Java 21 (Temurin 21 LTS)</a></p>
+</li>
+<li>
+<p>Claude Desktop</p>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://claude.ai/download">Download für Windows/macOS</a></p>
+</li>
+<li>
+<p><a href="https://github.com/aaddrick/claude-desktop-debian/tree/main#">Inoffizieller Repackaging-Download für Debian</a></p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Claude Desktop installieren und sich registrieren. Beim Repackaging-Download unter Debian-Systemen kann es sein, dass die App nicht gestartet wird. Dann im Terminal mit <code>claude-desktop --no-sandbox</code> starten.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_basisprojekt"><a class="anchor" href="#_basisprojekt"></a>3.3. Basisprojekt</h3>
+<div class="paragraph">
+<p>Als Basisprojekt wird ein Quarkus-Projekt genommen, welches mittels JDBC und Panache an eine PostgreSQL-Datenbank angebunden ist.
+Die in der CSV-Datei liegende Sprechstundenliste wird normalisiert und in die Datenbank gespielt.
+Mehr dazu: <strong>TODO</strong></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_maven_dependency"><a class="anchor" href="#_maven_dependency"></a>3.4. Maven-Dependency</h3>
+<div class="paragraph">
+<p>Nun folgt die Entscheidung, ob die Kommunikation über STDIO oder SSE ablaufen soll.
+Für beide Fälle gibt es die passende Dependency.</p>
+</div>
+<div class="paragraph">
+<p>STDIO:</p>
+</div>
+<details>
+<summary class="title">Details</summary>
+<div class="content">
+<div class="listingblock">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="xml"><span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>io.quarkiverse.mcp<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>quarkus-mcp-server-stdio<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;version&gt;</span>1.0.0<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span></code></pre>
+</div>
+</div>
+</div>
+</details>
+<div class="paragraph">
+<p>SSE:</p>
+</div>
+<details>
+<summary class="title">Details</summary>
+<div class="content">
+<div class="listingblock">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="xml"><span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>io.quarkiverse.mcp<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>quarkus-mcp-server-sse<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;version&gt;</span>1.0.0<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span></code></pre>
+</div>
+</div>
+</div>
+</details>
+</div>
+<div class="sect2">
+<h3 id="_implementierung_der_tools"><a class="anchor" href="#_implementierung_der_tools"></a>3.5. Implementierung der Tools</h3>
+<div class="paragraph">
+<p>Die Tools sind unsere "Endpoints", wo das LLM später drauf zugreifen wird. Tools sind Methoden mit der <code>@Tool</code>-Annotation.
+Deren Implementierung ist einfacher als die Implementierung von REST-Endpoints, da anstatt die Endpoints nicht mit Pfaden oder HTTP-Verben, sondern mit <strong>natürlicher Sprache</strong> definiert werden.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">McpTools</span><span class="o">{</span>
+    <span class="nd">@Inject</span>
+    <span class="nc">TeacherRepository</span> <span class="n">teacherRepository</span><span class="o">;</span>
+
+    <span class="nd">@Inject</span>
+    <span class="nc">OfficeHourRepository</span> <span class="n">officeHourRepository</span><span class="o">;</span>
+
+    <span class="nd">@Tool</span><span class="o">(</span><span class="n">description</span> <span class="o">=</span> <span class="s">"Alle Lehrerinnen und Lehrer der HTL Leonding anzeigen"</span><span class="o">)</span>
+    <span class="nd">@Transactional</span>
+    <span class="kd">public</span> <span class="nc">String</span> <span class="nf">getAllTeachers</span><span class="o">(){</span>
+        <span class="k">return</span> <span class="n">teacherRepository</span><span class="o">.</span><span class="na">getAllTeachersAsString</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Tool</span><span class="o">(</span><span class="n">description</span> <span class="o">=</span> <span class="s">"Sprechstunde einer Lehrerin oder eines Lehrers anzeigen"</span><span class="o">)</span>
+    <span class="nd">@Transactional</span>
+    <span class="kd">public</span> <span class="nc">String</span> <span class="nf">getDetailsPerTeacher</span><span class="o">(</span>
+            <span class="nd">@ToolArg</span><span class="o">(</span><span class="n">description</span> <span class="o">=</span> <span class="s">"Vor- oder Nachname des Lehrers"</span><span class="o">)</span> <span class="nc">String</span> <span class="n">name</span>
+    <span class="o">){</span>
+        <span class="k">return</span> <span class="n">officeHourRepository</span><span class="o">.</span><span class="na">getAllOfficeHoursByTeacherNameAsString</span><span class="o">(</span><span class="n">name</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Tool</span><span class="o">(</span><span class="n">description</span> <span class="o">=</span> <span class="s">"Alle Lehrerinnen und Lehrer eines Raumes anzeigen"</span><span class="o">)</span>
+    <span class="nd">@Transactional</span>
+    <span class="kd">public</span> <span class="nc">String</span> <span class="nf">getAllTeachersByRoom</span><span class="o">(</span>
+            <span class="nd">@ToolArg</span><span class="o">(</span><span class="n">description</span> <span class="o">=</span> <span class="s">"Raum"</span><span class="o">)</span> <span class="nc">String</span> <span class="n">room</span>
+    <span class="o">){</span>
+        <span class="k">return</span> <span class="n">officeHourRepository</span><span class="o">.</span><span class="na">getTeachersByRoom</span><span class="o">(</span><span class="n">room</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In diesem Stück Source Code gibt es 3 Methoden:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>getAllTeachers</code>: gibt Liste aller Lehrerinnen und Lehrer der HTL Leonding als String zurück</p>
+</li>
+<li>
+<p><code>getDetailsPerTeacher</code>: gibt die Sprechstunden-Daten einer einzelnen Lehrkraft als String zurück</p>
+</li>
+<li>
+<p><code>getAllTeachersByRoom</code>: gibt alle Lehrkräfte aus einem Raum als String zurück</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><code>@Tool(description = "&#8230;&#8203;")</code> ist dabei die Beschreibung des Tools als Fließtext. Das LLM vergleicht den vom User eingegebenen Prompt mit allen Beschreibungen und wählt jenes Tool, wo die Beschreibung mit dem Prompt zusammenpasst.</p>
+</div>
+<div class="paragraph">
+<p><code>@ToolArg(description = "&#8230;&#8203;")</code> ist dabei ein Parameter, welcher vom LLM aus dem Prompt des Users extrahiert werden und in der Methode verwendet werden kann.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_claude_ai_mit_mcp_server_verbinden_stdio"><a class="anchor" href="#_claude_ai_mit_mcp_server_verbinden_stdio"></a>3.6. Claude AI mit MCP-Server verbinden (STDIO)</h3>
+<div class="sect3">
+<h4 id="_packaging_als_uber_jar"><a class="anchor" href="#_packaging_als_uber_jar"></a>3.6.1. Packaging als Uber-JAR</h4>
+<div class="paragraph">
+<p>Dafür wird <code>application.properties</code> um folgenden Eintrag erweitert:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="properties"><span class="py">quarkus.package.jar.type</span><span class="p">=</span><span class="s">uber-jar</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>und folgender Befehl ausgeführt:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">mvn clean package</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Pfad zum Uber-JAR notieren!</strong></p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_claude_konfigurationsdatei"><a class="anchor" href="#_claude_konfigurationsdatei"></a>3.6.2. Claude-Konfigurationsdatei</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>Claude Desktop: Hamburger-Menu &gt; File &gt; Settings</p>
+</li>
+<li>
+<p>Settings: Developer &gt; Edit Config</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Der File-Explorer öffnet sich und markiert die Konfigurationsdatei <code>claude_desktop_config.json</code>.
+Diese um folgende Einträge erweitern:</p>
+</div>
+<div class="listingblock">
+<div class="title">claude_desktop_config.json</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="json"><span class="p">{</span><span class="w">
+  </span><span class="nl">"mcpServers"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"quarkus-officehours-mcp"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"java"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"args"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="s2">"-jar"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"&lt;path-to-jar&gt;/officehours-mcp-1.0-SNAPSHOT-runner.jar"</span><span class="w">
+      </span><span class="p">]</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Beim Öffnen von Claude Desktop wird nun die JAR gestartet und der MCP-Client hängt sich in die STDIO-Console.
+Zusätzliche Dienste wie die Datenbank müssen extra gestartet werden, deshalb ist diese Art der Kommunikation (STDIO) eher zum Entwickeln gedacht.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_claude_ai_mit_mcp_server_verbinden_sse"><a class="anchor" href="#_claude_ai_mit_mcp_server_verbinden_sse"></a>3.7. Claude AI mit MCP-Server verbinden (SSE)</h3>
+<div class="paragraph">
+<p>Voraussetzung ist ein über HTTP(S) erreichbarer Quarkus-MCP-Server.
+Ob dieser deployed wurde, lokal als JAR, nativ oder im Dev Mode läuft, spielt hierbei keine Rolle.</p>
+</div>
+<div class="sect3">
+<h4 id="_claude_konfigurationsdatei_2"><a class="anchor" href="#_claude_konfigurationsdatei_2"></a>3.7.1. Claude-Konfigurationsdatei</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>Claude Desktop: Hamburger-Menu &gt; File &gt; Settings</p>
+</li>
+<li>
+<p>Settings: Developer &gt; Edit Config</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Der File-Explorer öffnet sich und markiert die Konfigurationsdatei <code>claude_desktop_config.json</code>.
+Diese um folgende Einträge erweitern:</p>
+</div>
+<div class="listingblock">
+<div class="title">claude_desktop_config.json</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="json"><span class="p">{</span><span class="w">
+  </span><span class="nl">"mcpServers"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"quarkus-officehours-mcp"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"npx"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"args"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="s2">"mcp-remote"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"http://localhost:8080/mcp/sse"</span><span class="w">
+      </span><span class="p">]</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>npx</code> ist ein Tool, um Befehle eines npm-Packages direkt auszuführen, ohne dass das npm-Package installiert werden muss.</p>
+</div>
+<div class="paragraph">
+<p><code>mcp-remote</code> ist ein npm-Package, welches erlaubt, MCP-Protokolle über HTTP(S) laufen zu lassen.</p>
+</div>
+<div class="paragraph">
+<p>Die Adresse des MCP-Servers muss angegeben werden. Der Pfad zur Kommunikation mit <code>JSON-RPC</code> ist standardmäßig <code>/mcp/sse</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_wissen_benutzen"><a class="anchor" href="#_wissen_benutzen"></a>3.8. Wissen benutzen</h3>
+<div class="paragraph">
+<p>Das Hammer-Symbol unter der Prompt-Eingabe in Claude Desktop öffnet ein Popup, wo alle verfügbaren Tools angezeigt werden.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/claude-mcp-viewer.png" alt="claude mcp viewer">
+</div>
+</div>
+<div class="paragraph">
+<p>Das Prompten kann nun losgehen :-)</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+Welcher Lehrkräfte arbeiten an der HTL Leonding?
+</blockquote>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/claude-allteachers.png" alt="claude allteachers">
+</div>
+</div>
+<div class="quoteblock">
+<blockquote>
+Wann hat Herr Thomas Stütz Sprechstunde?
+</blockquote>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/claude-officehours.png" alt="claude officehours">
+</div>
+</div>
+<div class="quoteblock">
+<blockquote>
+Wer sitzt gemeinsam mit Herrn Thomas Stütz noch im Büro?
+</blockquote>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/claude-teachers-room.png" alt="claude teachers room">
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_mcp_server_deployen"><a class="anchor" href="#_mcp_server_deployen"></a>4. MCP-Server deployen</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Mittels einem Deployment auf der Leocloud kann der MCP-Server für alle zugänglich gemacht werden.
+Mehr dazu: TODO</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_glossar"><a class="anchor" href="#_glossar"></a>5. Glossar</h2>
 <div class="sectionbody">
 <div class="ulist">
 <ul>
@@ -520,7 +1037,7 @@ Ein MCP-Server kann unter anderem auch in Quarkus oder Spring Boot implementiert
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-04-01 12:59:23 UTC
+Last updated 2025-04-10 23:54:53 UTC
 </div>
 </div>
 </body>
