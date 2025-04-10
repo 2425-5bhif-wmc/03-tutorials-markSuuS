@@ -1,4 +1,4 @@
-= MCP Server in Quarkus
+= MCP-Server in Quarkus
 :toc:
 ifndef::imagesdir[:imagesdir: images]
 :icons: font
@@ -14,8 +14,230 @@ Mit MCP können Entwickler entweder ihre Daten für KI-Systeme „bereitstellen�
 Anthropic's Claude AI ist dabei das erste LLM, dass die Integration von MCP-Servern in deren Chatbot erlaubt.
 Ein MCP-Server kann unter anderem auch in Quarkus oder Spring Boot implementiert werden.
 
-image::mcp-architecture.png[]
+image::mcp.png[]
 
+== Wie funktioniert MCP?
+
+1. Die Grundlage aller Datenbestände bildet eine zentrale Datenbank.
+2. Eine spezialisierte Anwendung dient als Schnittstelle: Sie verfügt einerseits über Zugriff auf diese Datenbank und stellt andererseits die darin enthaltenen Informationen über das MCP-Protokoll zur Verfügung.
+3. Der Nutzer interagiert über einen LLM-Client (z.B. Claude AI). Das LLM hat Zugriff auf die verschiedenen MCP-Interfaces (die sogennanten Tools) der Anwendungen und identifiziert anhand der gestellten Anfrage das am besten geeignete Interface.
+4. Anschließend stellt es eine Abfrage an dieses Tool – gegebenenfalls unter Angabe von Parametern.
+5. Je nach implementierter Logik liefert das angesprochene MCP-Interface die angeforderten Daten an den LLM-Client zurück.
+6. Auf Basis dieser Daten generiert das LLM eine passende Antwort.
+
+Das MCP-Protokoll basiert auf `JSON-RPC`. Die Kommunikation kann dabei auf zwei Arten erfolgen:
+
+* *STDIO (Standard Input/Output)*: Der MCP-Client nutzt die STDIO-Konsole des MCP-Servers zur Übertragung der `JSON-RPC`-Anfragen.
+** eher für den Entwicklungsprozess geeignet
+* *SSE (Server-Sent Events)*: Der MCP-Client kommuniziert über ein Webinterface mit dem Server und sendet die `JSON-RPC`-Aufrufe darüber.
+** für Produktivbetrieb geeignet
+
+image::mcp-stack.png[]
+
+== Implementierung mit Quarkus
+=== Motivation
+Es soll ein MCP-Server gebaut werden, welcher Auskunft über die Sprechstunden der Lehrerinnen und Lehrer der HTL Leonding geben kann.
+Als Datenbasis wird die Sprechstundenliste als CSV-Datei von https://mese.webuntis.com/timetable-contact-hours genommen.
+
+=== Voraussetzungen
+* Java-IDE wie IntelliJ IDEA von großem Vorteil
+* https://sdkman.io/sdks#maven[Maven 3.9.9] oder Maven-Wrapper
+* https://sdkman.io/jdks#tem[Java 21 (Temurin 21 LTS)]
+* Claude Desktop
+** https://claude.ai/download[Download für Windows/macOS]
+** https://github.com/aaddrick/claude-desktop-debian/tree/main#[Inoffizieller Repackaging-Download für Debian]
+
+NOTE: Claude Desktop installieren und sich registrieren. Beim Repackaging-Download unter Debian-Systemen kann es sein, dass die App nicht gestartet wird. Dann im Terminal mit `claude-desktop --no-sandbox` starten.
+
+=== Basisprojekt
+Als Basisprojekt wird ein Quarkus-Projekt genommen, welches mittels JDBC und Panache an eine PostgreSQL-Datenbank angebunden ist.
+Die in der CSV-Datei liegende Sprechstundenliste wird normalisiert und in die Datenbank gespielt.
+Mehr dazu: *TODO*
+
+=== Maven-Dependency
+Nun folgt die Entscheidung, ob die Kommunikation über STDIO oder SSE ablaufen soll.
+Für beide Fälle gibt es die passende Dependency.
+
+STDIO:
+[%collapsible]
+====
+.pom.xml
+[source,xml]
+----
+<dependency>
+    <groupId>io.quarkiverse.mcp</groupId>
+    <artifactId>quarkus-mcp-server-stdio</artifactId>
+    <version>1.0.0</version>
+</dependency>
+----
+====
+
+SSE:
+[%collapsible]
+====
+.pom.xml
+[source,xml]
+----
+<dependency>
+    <groupId>io.quarkiverse.mcp</groupId>
+    <artifactId>quarkus-mcp-server-sse</artifactId>
+    <version>1.0.0</version>
+</dependency>
+----
+====
+
+=== Implementierung der Tools
+Die Tools sind unsere "Endpoints", wo das LLM später drauf zugreifen wird. Tools sind Methoden mit der `@Tool`-Annotation.
+Deren Implementierung ist einfacher als die Implementierung von REST-Endpoints, da anstatt die Endpoints nicht mit Pfaden oder HTTP-Verben, sondern mit *natürlicher Sprache* definiert werden.
+
+[source, java]
+----
+public class McpTools{
+    @Inject
+    TeacherRepository teacherRepository;
+
+    @Inject
+    OfficeHourRepository officeHourRepository;
+
+    @Tool(description = "Alle Lehrerinnen und Lehrer der HTL Leonding anzeigen")
+    @Transactional
+    public String getAllTeachers(){
+        return teacherRepository.getAllTeachersAsString();
+    }
+
+    @Tool(description = "Sprechstunde einer Lehrerin oder eines Lehrers anzeigen")
+    @Transactional
+    public String getDetailsPerTeacher(
+            @ToolArg(description = "Vor- oder Nachname des Lehrers") String name
+    ){
+        return officeHourRepository.getAllOfficeHoursByTeacherNameAsString(name);
+    }
+
+    @Tool(description = "Alle Lehrerinnen und Lehrer eines Raumes anzeigen")
+    @Transactional
+    public String getAllTeachersByRoom(
+            @ToolArg(description = "Raum") String room
+    ){
+        return officeHourRepository.getTeachersByRoom(room);
+    }
+}
+----
+In diesem Stück Source Code gibt es 3 Methoden:
+
+* `getAllTeachers`: gibt Liste aller Lehrerinnen und Lehrer der HTL Leonding als String zurück
+* `getDetailsPerTeacher`: gibt die Sprechstunden-Daten einer einzelnen Lehrkraft als String zurück
+* `getAllTeachersByRoom`: gibt alle Lehrkräfte aus einem Raum als String zurück
+
+`@Tool(description = "...")` ist dabei die Beschreibung des Tools als Fließtext. Das LLM vergleicht den vom User eingegebenen Prompt mit allen Beschreibungen und wählt jenes Tool, wo die Beschreibung mit dem Prompt zusammenpasst.
+
+`@ToolArg(description = "...")` ist dabei ein Parameter, welcher vom LLM aus dem Prompt des Users extrahiert werden und in der Methode verwendet werden kann.
+
+=== Claude AI mit MCP-Server verbinden (STDIO)
+
+==== Packaging als Uber-JAR
+
+Dafür wird `application.properties` um folgenden Eintrag erweitert:
+
+[source, properties]
+----
+quarkus.package.jar.type=uber-jar
+----
+
+und folgender Befehl ausgeführt:
+
+[source, bash]
+----
+mvn clean package
+----
+
+*Pfad zum Uber-JAR notieren!*
+
+==== Claude-Konfigurationsdatei
+
+* Claude Desktop: Hamburger-Menu > File > Settings
+* Settings: Developer > Edit Config
+
+Der File-Explorer öffnet sich und markiert die Konfigurationsdatei `claude_desktop_config.json`.
+Diese um folgende Einträge erweitern:
+
+.claude_desktop_config.json
+[source, json]
+----
+{
+  "mcpServers": {
+    "quarkus-officehours-mcp": {
+      "command": "java",
+      "args": [
+        "-jar",
+        "<path-to-jar>/officehours-mcp-1.0-SNAPSHOT-runner.jar"
+      ]
+    }
+  }
+}
+----
+
+Beim Öffnen von Claude Desktop wird nun die JAR gestartet und der MCP-Client hängt sich in die STDIO-Console.
+Zusätzliche Dienste wie die Datenbank müssen extra gestartet werden, deshalb ist diese Art der Kommunikation (STDIO) eher zum Entwickeln gedacht.
+
+=== Claude AI mit MCP-Server verbinden (SSE)
+Voraussetzung ist ein über HTTP(S) erreichbarer Quarkus-MCP-Server.
+Ob dieser deployed wurde, lokal als JAR, nativ oder im Dev Mode läuft, spielt hierbei keine Rolle.
+
+==== Claude-Konfigurationsdatei
+
+* Claude Desktop: Hamburger-Menu > File > Settings
+* Settings: Developer > Edit Config
+
+Der File-Explorer öffnet sich und markiert die Konfigurationsdatei `claude_desktop_config.json`.
+Diese um folgende Einträge erweitern:
+
+.claude_desktop_config.json
+[source, json]
+----
+{
+  "mcpServers": {
+    "quarkus-officehours-mcp": {
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "http://localhost:8080/mcp/sse"
+      ]
+    }
+  }
+}
+----
+`npx` ist ein Tool, um Befehle eines npm-Packages direkt auszuführen, ohne dass das npm-Package installiert werden muss.
+
+`mcp-remote` ist ein npm-Package, welches erlaubt, MCP-Protokolle über HTTP(S) laufen zu lassen.
+
+Die Adresse des MCP-Servers muss angegeben werden. Der Pfad zur Kommunikation mit `JSON-RPC` ist standardmäßig `/mcp/sse`.
+
+=== Wissen benutzen
+
+Das Hammer-Symbol unter der Prompt-Eingabe in Claude Desktop öffnet ein Popup, wo alle verfügbaren Tools angezeigt werden.
+
+image::claude-mcp-viewer.png[]
+
+Das Prompten kann nun losgehen :-)
+
+[quote]
+Welcher Lehrkräfte arbeiten an der HTL Leonding?
+
+image::claude-allteachers.png[]
+
+[quote]
+Wann hat Herr Thomas Stütz Sprechstunde?
+
+image::claude-officehours.png[]
+
+[quote]
+Wer sitzt gemeinsam mit Herrn Thomas Stütz noch im Büro?
+
+image::claude-teachers-room.png[]
+
+== MCP-Server deployen
+Mittels einem Deployment auf der Leocloud kann der MCP-Server für alle zugänglich gemacht werden.
+Mehr dazu: TODO
 
 == Glossar
 
