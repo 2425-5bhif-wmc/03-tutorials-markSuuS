@@ -1,0 +1,46 @@
+name: GitHub Actions - Build Quarkus MCP Server
+run-name: ${{ github.actor }} is using GitHub Actions 🚀
+on: [push]
+jobs:
+  build:
+    permissions: write-all
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Make Actor and Repo lowercase
+        run: |
+          echo "ACTOR_LC=$(echo ${GITHUB_ACTOR} | tr '[:upper:]' '[:lower:]')" >>${GITHUB_ENV}
+          echo "REPO_LC=$(echo ${GITHUB_REPOSITORY} | tr '[:upper:]' '[:lower:]')" >>${GITHUB_ENV}
+
+      - name: Use ACTOR_LC and REPO_LC
+        run: |
+          echo ${{ env.ACTOR_LC }}
+          echo ${{ env.REPO_LC }}
+
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21 LTS
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Build with Maven
+        run: mvn -f officehours-mcp/pom.xml clean package -Dmaven.test.skip=true
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ env.ACTOR_LC }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: ./officehours-mcp
+          file: ./officehours-mcp/src/main/docker/Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: ghcr.io/${{ env.REPO_LC }}/quarkus-mcp-server:latest

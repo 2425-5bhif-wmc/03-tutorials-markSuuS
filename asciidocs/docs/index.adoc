@@ -212,6 +212,14 @@ Diese um folgende Einträge erweitern:
 
 Die Adresse des MCP-Servers muss angegeben werden. Der Pfad zur Kommunikation mit `JSON-RPC` ist standardmäßig `/mcp/sse`.
 
+IMPORTANT: Bei Linux wird trotz Beenden von Claude Desktop manchmal der npx-Prozess nicht beendet und die MCP-Schnittstelle wird blockiert, deswegen ist ein manuelles Beenden notwendig. Dies geschieht mit:
+
+[source, bash]
+----
+sudo lsof -i :3334
+kill -9 <pid>
+----
+
 === Wissen benutzen
 
 Das Hammer-Symbol unter der Prompt-Eingabe in Claude Desktop öffnet ein Popup, wo alle verfügbaren Tools angezeigt werden.
