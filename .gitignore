@@ -98,3 +98,5 @@ Temporary Items
 dist/
 docs/slides/revealjs
 .idea/
+**/db-postgres/
+**/.idea/

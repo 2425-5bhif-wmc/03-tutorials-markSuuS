@@ -40,8 +40,8 @@ public class InsertBean {
                 String[] parts = content[i].split("\t");
 
                 Teacher teacher = new Teacher();
-                teacher.setFirstName(parts[0].split(" ")[0].trim());
-                teacher.setLastName(parts[0].split(" ")[1].trim());
+                teacher.setLastName(parts[0].split(" ")[0].trim());
+                teacher.setFirstName(parts[0].split(" ")[1].trim());
                 teacherRepository.persist(teacher);
 
                 OfficeHour officeHour = new OfficeHour();

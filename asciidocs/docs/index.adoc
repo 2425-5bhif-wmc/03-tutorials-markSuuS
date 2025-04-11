@@ -243,10 +243,6 @@ Wer sitzt gemeinsam mit Herrn Thomas Stütz noch im Büro?
 
 image::claude-teachers-room.png[]
 
-== Deployment auf der Leocloud
-Mittels einem Deployment auf der Leocloud kann der MCP-Server für alle zugänglich gemacht werden.
-Mehr dazu: TODO
-
 == Glossar
 
 * *LLM*: Large Language Model
