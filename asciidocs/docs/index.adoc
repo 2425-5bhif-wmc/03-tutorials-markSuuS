@@ -1,4 +1,4 @@
-= MCP-Server in Quarkus
+= Connect Claude AI with own Quarkus MCP-Server
 :toc:
 ifndef::imagesdir[:imagesdir: images]
 :icons: font
@@ -88,7 +88,7 @@ SSE:
 
 === Implementierung der Tools
 Die Tools sind unsere "Endpoints", wo das LLM später drauf zugreifen wird. Tools sind Methoden mit der `@Tool`-Annotation.
-Deren Implementierung ist einfacher als die Implementierung von REST-Endpoints, da anstatt die Endpoints nicht mit Pfaden oder HTTP-Verben, sondern mit *natürlicher Sprache* definiert werden.
+Deren Implementierung ist einfacher als die Implementierung von REST-Endpoints, da die Endpoints nicht mit Pfaden oder HTTP-Verben, sondern mit *natürlicher Sprache* definiert werden.
 
 [source, java]
 ----
@@ -235,7 +235,7 @@ Wer sitzt gemeinsam mit Herrn Thomas Stütz noch im Büro?
 
 image::claude-teachers-room.png[]
 
-== MCP-Server deployen
+== Deployment auf der Leocloud
 Mittels einem Deployment auf der Leocloud kann der MCP-Server für alle zugänglich gemacht werden.
 Mehr dazu: TODO
 
