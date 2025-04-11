@@ -932,6 +932,24 @@ Diese um folgende Einträge erweitern:</p>
 <div class="paragraph">
 <p>Die Adresse des MCP-Servers muss angegeben werden. Der Pfad zur Kommunikation mit <code>JSON-RPC</code> ist standardmäßig <code>/mcp/sse</code>.</p>
 </div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+Bei Linux wird trotz Beenden von Claude Desktop manchmal der npx-Prozess nicht beendet und die MCP-Schnittstelle wird blockiert, deswegen ist ein manuelles Beenden notwendig. Dies geschieht mit:
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash"><span class="nb">sudo </span>lsof <span class="nt">-i</span> :3334
+<span class="nb">kill</span> <span class="nt">-9</span> &lt;pid&gt;</code></pre>
+</div>
+</div>
 </div>
 </div>
 <div class="sect2">
@@ -1037,7 +1055,7 @@ Mehr dazu: TODO</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-04-11 00:00:48 UTC
+Last updated 2025-04-11 07:20:43 UTC
 </div>
 </div>
 </body>
