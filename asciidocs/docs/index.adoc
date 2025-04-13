@@ -122,7 +122,7 @@ public class McpTools{
     }
 }
 ----
-In diesem Stück Source Code gibt es 3 Methoden:
+In der Klasse `McpTools` gibt es 3 Tools:
 
 * `getAllTeachers`: gibt Liste aller Lehrerinnen und Lehrer der HTL Leonding als String zurück
 * `getDetailsPerTeacher`: gibt die Sprechstunden-Daten einer einzelnen Lehrkraft als String zurück
@@ -196,20 +196,18 @@ Diese um folgende Einträge erweitern:
 {
   "mcpServers": {
     "quarkus-officehours-mcp": {
-      "command": "npx",
+      "command": "npx", <1>
       "args": [
-        "mcp-remote",
-        "http://localhost:8080/mcp/sse"
+        "mcp-remote", <2>
+        "http://localhost:8080/mcp/sse" <3>
       ]
     }
   }
 }
 ----
-`npx` ist ein Tool, um Befehle eines npm-Packages direkt auszuführen, ohne dass das npm-Package initialisiert werden muss.
-
-`mcp-remote` ist ein npm-Package, welches erlaubt, MCP-Protokolle über SSE laufen zu lassen.
-
-Die Adresse des MCP-Servers muss angegeben werden. Der Pfad ist standardmäßig `/mcp/sse`.
+<.> `npx` ist ein Tool, um Befehle eines npm-Packages direkt auszuführen, ohne dass das npm-Package initialisiert werden muss.
+<.> `mcp-remote` ist ein npm-Package, welches erlaubt, MCP-Protokolle über SSE laufen zu lassen.
+<.> Die Adresse des MCP-Servers muss angegeben werden. Der Pfad ist standardmäßig `/mcp/sse`.
 
 IMPORTANT: Bei Linux wird trotz Beenden von Claude Desktop manchmal der npx-Prozess nicht beendet und die MCP-Schnittstelle blockiert, deswegen ist ein manuelles Beenden notwendig. Dies geschieht mit:
 
