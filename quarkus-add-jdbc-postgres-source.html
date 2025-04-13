@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.20">
 <link rel="icon" type="image/png" href="themes/favicon.png">
-<title>Connect Claude AI with own Quarkus MCP-Server</title>
+<title>Quarkus: JDBC Datasource hinzufügen</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /*! Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
@@ -560,486 +560,138 @@ pre.rouge .gs {
 </head>
 <body class="article toc2 toc-left">
 <div id="header">
-<h1>Connect Claude AI with own Quarkus MCP-Server</h1>
+<h1>Quarkus: JDBC Datasource hinzufügen</h1>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#_einführung">1. Einführung</a></li>
-<li><a href="#_wie_funktioniert_mcp">2. Wie funktioniert MCP?</a></li>
-<li><a href="#_implementierung_mit_quarkus">3. Implementierung mit Quarkus</a>
-<ul class="sectlevel2">
-<li><a href="#_motivation">3.1. Motivation</a></li>
-<li><a href="#_voraussetzungen">3.2. Voraussetzungen</a></li>
-<li><a href="#_basisprojekt">3.3. Basisprojekt</a></li>
-<li><a href="#_maven_dependency">3.4. Maven-Dependency</a></li>
-<li><a href="#_implementierung_der_tools">3.5. Implementierung der Tools</a></li>
-<li><a href="#_claude_ai_mit_mcp_server_verbinden_stdio">3.6. Claude AI mit MCP-Server verbinden (STDIO)</a></li>
-<li><a href="#_claude_ai_mit_mcp_server_verbinden_sse">3.7. Claude AI mit MCP-Server verbinden (SSE)</a></li>
-<li><a href="#_wissen_benutzen">3.8. Wissen benutzen</a></li>
-</ul>
-</li>
-<li><a href="#_glossar">4. Glossar</a></li>
+<li><a href="#_postgresql_17_in_docker_starten">1. PostgreSQL 17 in Docker starten</a></li>
+<li><a href="#_datasource_txt_für_integrierten_datenbank_explorer">2. datasource.txt für integrierten Datenbank-Explorer</a></li>
+<li><a href="#_application_properties_um_folgende_properties_erweitern">3. application.properties um folgende Properties erweitern</a></li>
+<li><a href="#_jdbc_treiber_hinzufügen">4. JDBC-Treiber hinzufügen</a></li>
+<li><a href="#_hibernate_orm_mit_panache_hinzufügen">5. Hibernate ORM mit Panache hinzufügen</a></li>
+<li><a href="#_läuft_nun_ist_es_möglich_mittels_panache_jpa_entities_in_der_postgresql_datenbank_zu_persistieren">6. Läuft. Nun ist es möglich mittels Panache JPA Entities in der PostgreSQL-Datenbank zu persistieren</a></li>
 </ul>
 </div>
 </div>
 <div id="content">
-<div class="sect1">
-<h2 id="_einführung"><a class="anchor" href="#_einführung"></a>1. Einführung</h2>
+<div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p>Anthropic hat ein neues offenes Protokoll namens Model Context Protocol (MCP) vorgestellt. Die Idee dahinter: KI-Assistenten sollen viel einfacher auf externe Datenquellen oder sogar komplette Apps zugreifen können – und zwar sicher, flexibel und effizient.
-Mit MCP können Entwickler entweder ihre Daten für KI-Systeme „bereitstellen“ oder Tools bauen, die diese Daten über standardisierte Schnittstellen abrufen.
-Anthropic&#8217;s Claude AI ist dabei das erste LLM, dass die Integration von MCP-Servern in deren Chatbot erlaubt.
-Ein MCP-Server kann unter anderem auch in Quarkus oder Spring Boot implementiert werden.</p>
+<p><em>mit PostgreSQL als Beispiel</em></p>
 </div>
-<div class="imageblock">
+</div>
+</div>
+<div class="sect1">
+<h2 id="_postgresql_17_in_docker_starten"><a class="anchor" href="#_postgresql_17_in_docker_starten"></a>1. PostgreSQL 17 in Docker starten</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="title">postgres-run-in-docker.sh</div>
 <div class="content">
-<img src="images/mcp.png" alt="mcp">
+<pre class="rouge highlight"><code data-lang="bash">docker run <span class="nt">--rm</span> <span class="se">\</span>
+           <span class="nt">--name</span> postgres-db <span class="se">\</span>
+           <span class="nt">-e</span> <span class="nv">POSTGRES_USER</span><span class="o">=</span>app <span class="se">\</span>
+           <span class="nt">-e</span> <span class="nv">POSTGRES_PASSWORD</span><span class="o">=</span>app <span class="se">\</span>
+           <span class="nt">-e</span> <span class="nv">POSTGRES_DB</span><span class="o">=</span>db <span class="se">\</span>
+           <span class="nt">-v</span> <span class="k">${</span><span class="nv">PWD</span><span class="k">}</span>/db-postgres/db:/var/lib/postgresql/data <span class="se">\</span>
+           <span class="nt">-p</span> 5432:5432 <span class="se">\</span>
+           postgres:17-alpine</code></pre>
 </div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_wie_funktioniert_mcp"><a class="anchor" href="#_wie_funktioniert_mcp"></a>2. Wie funktioniert MCP?</h2>
+<h2 id="_datasource_txt_für_integrierten_datenbank_explorer"><a class="anchor" href="#_datasource_txt_für_integrierten_datenbank_explorer"></a>2. datasource.txt für integrierten Datenbank-Explorer</h2>
 <div class="sectionbody">
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p>Die Grundlage aller Datenbestände bildet eine zentrale Datenbank.</p>
-</li>
-<li>
-<p>Eine spezialisierte Anwendung dient als Schnittstelle: Sie verfügt einerseits über Zugriff auf diese Datenbank und stellt andererseits die darin enthaltenen Informationen über das MCP-Protokoll zur Verfügung.</p>
-</li>
-<li>
-<p>Der Nutzer interagiert über einen LLM-Client (z.B. Claude AI). Das LLM hat Zugriff auf die verschiedenen MCP-Interfaces (die sogennanten Tools) der Anwendungen und identifiziert anhand der gestellten Anfrage das am besten geeignete Tool.</p>
-</li>
-<li>
-<p>Anschließend stellt es eine Abfrage an dieses Tool – gegebenenfalls unter Angabe von Parametern.</p>
-</li>
-<li>
-<p>Je nach implementierter Logik liefert das aufgerufene MCP-Tool die angeforderten Daten an den LLM-Client zurück.</p>
-</li>
-<li>
-<p>Auf Basis dieser Daten generiert das LLM eine passende Antwort.</p>
-</li>
-</ol>
-</div>
-<div class="paragraph">
-<p>Das MCP-Protokoll basiert auf <code>JSON-RPC</code>. Die Kommunikation kann dabei auf zwei Arten erfolgen:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><strong>STDIO (Standard Input/Output)</strong>: Der MCP-Client nutzt die STDIO-Konsole des MCP-Servers zur Übertragung der <code>JSON-RPC</code>-Anfragen.</p>
-<div class="ulist">
-<ul>
-<li>
-<p>eher für den Entwicklungsprozess geeignet</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p><strong>SSE (Server-Sent Events)</strong>: Der MCP-Client kommuniziert über ein Webinterface mit dem Server und sendet die <code>JSON-RPC</code>-Aufrufe darüber.</p>
-<div class="ulist">
-<ul>
-<li>
-<p>für Produktivbetrieb geeignet</p>
-</li>
-</ul>
-</div>
-</li>
-</ul>
-</div>
-<div class="imageblock">
+<div class="listingblock">
+<div class="title">datasource.txt</div>
 <div class="content">
-<img src="images/mcp-stack.png" alt="mcp stack">
+<pre class="rouge highlight"><code data-lang="text">#DataSourceSettings#
+#LocalDataSource: db@localhost
+#BEGIN#
+&lt;data-source source="LOCAL" name="db@localhost" uuid="6e303d8d-ca35-4f08-a10b-ea9a45ee2aa2"&gt;&lt;database-info product="PostgreSQL" version="15.2" jdbc-version="4.2" driver-name="PostgreSQL JDBC Driver" driver-version="42.5.0" dbms="POSTGRES" exact-version="15.2" exact-driver-version="42.5"&gt;&lt;identifier-quote-string&gt;&amp;quot;&lt;/identifier-quote-string&gt;&lt;/database-info&gt;&lt;case-sensitivity plain-identifiers="lower" quoted-identifiers="exact"/&gt;&lt;driver-ref&gt;postgresql&lt;/driver-ref&gt;&lt;synchronize&gt;true&lt;/synchronize&gt;&lt;jdbc-driver&gt;org.postgresql.Driver&lt;/jdbc-driver&gt;&lt;jdbc-url&gt;jdbc:postgresql://localhost:5432/db&lt;/jdbc-url&gt;&lt;secret-storage&gt;master_key&lt;/secret-storage&gt;&lt;user-name&gt;app&lt;/user-name&gt;&lt;schema-mapping&gt;&lt;introspection-scope&gt;&lt;node kind="database" qname="@"&gt;&lt;node kind="schema" qname="@"/&gt;&lt;/node&gt;&lt;/introspection-scope&gt;&lt;/schema-mapping&gt;&lt;working-dir&gt;$ProjectFileDir$&lt;/working-dir&gt;&lt;/data-source&gt;
+#END#</code></pre>
 </div>
 </div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_implementierung_mit_quarkus"><a class="anchor" href="#_implementierung_mit_quarkus"></a>3. Implementierung mit Quarkus</h2>
-<div class="sectionbody">
-<div class="sect2">
-<h3 id="_motivation"><a class="anchor" href="#_motivation"></a>3.1. Motivation</h3>
-<div class="paragraph">
-<p>Es soll ein MCP-Server gebaut werden, welcher Auskunft über die Sprechstunden der Lehrerinnen und Lehrer der HTL Leonding geben kann.
-Als Datenbasis wird die Sprechstundenliste als CSV-Datei von <a href="https://mese.webuntis.com/timetable-contact-hours" class="bare">https://mese.webuntis.com/timetable-contact-hours</a> genommen.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_voraussetzungen"><a class="anchor" href="#_voraussetzungen"></a>3.2. Voraussetzungen</h3>
-<div class="ulist">
-<ul>
-<li>
-<p>Java-IDE wie IntelliJ IDEA von großem Vorteil</p>
-</li>
-<li>
-<p><a href="https://sdkman.io/sdks#maven">Maven 3.9.9</a> oder Maven-Wrapper</p>
-</li>
-<li>
-<p><a href="https://sdkman.io/jdks#tem">Java 21 (Temurin 21 LTS)</a></p>
-</li>
-<li>
-<p>Claude Desktop</p>
-<div class="ulist">
-<ul>
-<li>
-<p><a href="https://claude.ai/download">Download für Windows/macOS</a></p>
-</li>
-<li>
-<p><a href="https://github.com/aaddrick/claude-desktop-debian/tree/main#">Inoffizieller Repackaging-Download für Debian</a></p>
-</li>
-</ul>
-</div>
-</li>
-</ul>
-</div>
-<div class="admonitionblock note">
+<div class="admonitionblock tip">
 <table>
 <tr>
 <td class="icon">
-<i class="fa icon-note" title="Note"></i>
+<i class="fa icon-tip" title="Tip"></i>
 </td>
 <td class="content">
-Claude Desktop installieren und sich registrieren. Beim Repackaging-Download unter Debian-Systemen kann es sein, dass die App nicht gestartet wird. Dann im Terminal mit <code>claude-desktop --no-sandbox</code> starten.
+Aus Sicherheitsgründen muss im Popup das Passwort erneut eingegeben werden.
 </td>
 </tr>
 </table>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_basisprojekt"><a class="anchor" href="#_basisprojekt"></a>3.3. Basisprojekt</h3>
-<div class="paragraph">
-<p>Als Basisprojekt wird ein Quarkus-Projekt genommen, welches mittels JDBC und Panache an eine PostgreSQL-Datenbank angebunden ist.
-Die in der CSV-Datei liegende Sprechstundenliste wird normalisiert und in die Datenbank gespielt.
-Mehr dazu: <strong>TODO</strong></p>
 </div>
-</div>
-<div class="sect2">
-<h3 id="_maven_dependency"><a class="anchor" href="#_maven_dependency"></a>3.4. Maven-Dependency</h3>
-<div class="paragraph">
-<p>Nun folgt die Entscheidung, ob die Kommunikation über STDIO oder SSE ablaufen soll.
-Für beide Fälle gibt es die passende Dependency.</p>
-</div>
-<div class="paragraph">
-<p>STDIO:</p>
-</div>
-<details>
-<summary class="title">Details</summary>
-<div class="content">
+<div class="sect1">
+<h2 id="_application_properties_um_folgende_properties_erweitern"><a class="anchor" href="#_application_properties_um_folgende_properties_erweitern"></a>3. application.properties um folgende Properties erweitern</h2>
+<div class="sectionbody">
 <div class="listingblock">
-<div class="title">pom.xml</div>
+<div class="title">application.properties</div>
 <div class="content">
-<pre class="rouge highlight"><code data-lang="xml"><span class="nt">&lt;dependency&gt;</span>
-    <span class="nt">&lt;groupId&gt;</span>io.quarkiverse.mcp<span class="nt">&lt;/groupId&gt;</span>
-    <span class="nt">&lt;artifactId&gt;</span>quarkus-mcp-server-stdio<span class="nt">&lt;/artifactId&gt;</span>
-    <span class="nt">&lt;version&gt;</span>1.0.0<span class="nt">&lt;/version&gt;</span>
-<span class="nt">&lt;/dependency&gt;</span></code></pre>
-</div>
-</div>
-</div>
-</details>
-<div class="paragraph">
-<p>SSE:</p>
-</div>
-<details>
-<summary class="title">Details</summary>
-<div class="content">
-<div class="listingblock">
-<div class="title">pom.xml</div>
-<div class="content">
-<pre class="rouge highlight"><code data-lang="xml"><span class="nt">&lt;dependency&gt;</span>
-    <span class="nt">&lt;groupId&gt;</span>io.quarkiverse.mcp<span class="nt">&lt;/groupId&gt;</span>
-    <span class="nt">&lt;artifactId&gt;</span>quarkus-mcp-server-sse<span class="nt">&lt;/artifactId&gt;</span>
-    <span class="nt">&lt;version&gt;</span>1.0.0<span class="nt">&lt;/version&gt;</span>
-<span class="nt">&lt;/dependency&gt;</span></code></pre>
-</div>
-</div>
-</div>
-</details>
-</div>
-<div class="sect2">
-<h3 id="_implementierung_der_tools"><a class="anchor" href="#_implementierung_der_tools"></a>3.5. Implementierung der Tools</h3>
-<div class="paragraph">
-<p>Die Tools sind unsere "Endpoints", wo das LLM später drauf zugreifen wird. Tools sind Methoden mit der <code>@Tool</code>-Annotation.
-Deren Implementierung ist einfacher als die Implementierung von REST-Endpoints, da die Endpoints nicht mit Pfaden oder HTTP-Verben, sondern mit <strong>natürlicher Sprache</strong> definiert werden.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">McpTools</span><span class="o">{</span>
-    <span class="nd">@Inject</span>
-    <span class="nc">TeacherRepository</span> <span class="n">teacherRepository</span><span class="o">;</span>
+<pre class="rouge highlight"><code data-lang="properties"><span class="c"># datasource configuration
+</span><span class="py">quarkus.datasource.db-kind</span> <span class="p">=</span> <span class="s">postgresql</span>
+<span class="py">quarkus.datasource.username</span> <span class="p">=</span> <span class="s">app</span>
+<span class="py">quarkus.datasource.password</span> <span class="p">=</span> <span class="s">app</span>
+<span class="py">quarkus.datasource.jdbc.url</span> <span class="p">=</span> <span class="s">jdbc:postgresql://localhost:5432/db</span>
 
-    <span class="nd">@Inject</span>
-    <span class="nc">OfficeHourRepository</span> <span class="n">officeHourRepository</span><span class="o">;</span>
-
-    <span class="nd">@Tool</span><span class="o">(</span><span class="n">description</span> <span class="o">=</span> <span class="s">"Alle Lehrerinnen und Lehrer der HTL Leonding anzeigen"</span><span class="o">)</span>
-    <span class="nd">@Transactional</span>
-    <span class="kd">public</span> <span class="nc">String</span> <span class="nf">getAllTeachers</span><span class="o">(){</span>
-        <span class="k">return</span> <span class="n">teacherRepository</span><span class="o">.</span><span class="na">getAllTeachersAsString</span><span class="o">();</span>
-    <span class="o">}</span>
-
-    <span class="nd">@Tool</span><span class="o">(</span><span class="n">description</span> <span class="o">=</span> <span class="s">"Sprechstunde einer Lehrerin oder eines Lehrers anzeigen"</span><span class="o">)</span>
-    <span class="nd">@Transactional</span>
-    <span class="kd">public</span> <span class="nc">String</span> <span class="nf">getDetailsPerTeacher</span><span class="o">(</span>
-            <span class="nd">@ToolArg</span><span class="o">(</span><span class="n">description</span> <span class="o">=</span> <span class="s">"Vor- oder Nachname des Lehrers"</span><span class="o">)</span> <span class="nc">String</span> <span class="n">name</span>
-    <span class="o">){</span>
-        <span class="k">return</span> <span class="n">officeHourRepository</span><span class="o">.</span><span class="na">getAllOfficeHoursByTeacherNameAsString</span><span class="o">(</span><span class="n">name</span><span class="o">);</span>
-    <span class="o">}</span>
-
-    <span class="nd">@Tool</span><span class="o">(</span><span class="n">description</span> <span class="o">=</span> <span class="s">"Alle Lehrerinnen und Lehrer eines Raumes anzeigen"</span><span class="o">)</span>
-    <span class="nd">@Transactional</span>
-    <span class="kd">public</span> <span class="nc">String</span> <span class="nf">getAllTeachersByRoom</span><span class="o">(</span>
-            <span class="nd">@ToolArg</span><span class="o">(</span><span class="n">description</span> <span class="o">=</span> <span class="s">"Raum"</span><span class="o">)</span> <span class="nc">String</span> <span class="n">room</span>
-    <span class="o">){</span>
-        <span class="k">return</span> <span class="n">officeHourRepository</span><span class="o">.</span><span class="na">getTeachersByRoom</span><span class="o">(</span><span class="n">room</span><span class="o">);</span>
-    <span class="o">}</span>
-<span class="o">}</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>In diesem Stück Source Code gibt es 3 Methoden:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><code>getAllTeachers</code>: gibt Liste aller Lehrerinnen und Lehrer der HTL Leonding als String zurück</p>
-</li>
-<li>
-<p><code>getDetailsPerTeacher</code>: gibt die Sprechstunden-Daten einer einzelnen Lehrkraft als String zurück</p>
-</li>
-<li>
-<p><code>getAllTeachersByRoom</code>: gibt alle Lehrkräfte aus einem Raum als String zurück</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p><code>@Tool(description = "&#8230;&#8203;")</code> ist dabei die Beschreibung des Tools als Fließtext. Das LLM vergleicht den vom User eingegebenen Prompt mit allen Beschreibungen und wählt jenes Tool, wo die Beschreibung mit dem Prompt zusammenpasst.</p>
-</div>
-<div class="paragraph">
-<p><code>@ToolArg(description = "&#8230;&#8203;")</code> ist dabei ein Parameter, welcher vom LLM aus dem Prompt des Users extrahiert werden und in der Methode verwendet werden kann.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_claude_ai_mit_mcp_server_verbinden_stdio"><a class="anchor" href="#_claude_ai_mit_mcp_server_verbinden_stdio"></a>3.6. Claude AI mit MCP-Server verbinden (STDIO)</h3>
-<div class="sect3">
-<h4 id="_packaging_als_uber_jar"><a class="anchor" href="#_packaging_als_uber_jar"></a>3.6.1. Packaging als Uber-JAR</h4>
-<div class="paragraph">
-<p>Dafür wird <code>application.properties</code> um folgenden Eintrag erweitert:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="properties"><span class="py">quarkus.package.jar.type</span><span class="p">=</span><span class="s">uber-jar</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>und folgender Befehl ausgeführt:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="bash">mvn clean package</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p><strong>Pfad zum Uber-JAR notieren!</strong></p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_claude_konfigurationsdatei"><a class="anchor" href="#_claude_konfigurationsdatei"></a>3.6.2. Claude-Konfigurationsdatei</h4>
-<div class="ulist">
-<ul>
-<li>
-<p>Claude Desktop: Hamburger-Menu &gt; File &gt; Settings</p>
-</li>
-<li>
-<p>Settings: Developer &gt; Edit Config</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>Der File-Explorer öffnet sich und markiert die Konfigurationsdatei <code>claude_desktop_config.json</code>.
-Diese um folgende Einträge erweitern:</p>
-</div>
-<div class="listingblock">
-<div class="title">claude_desktop_config.json</div>
-<div class="content">
-<pre class="rouge highlight"><code data-lang="json"><span class="p">{</span><span class="w">
-  </span><span class="nl">"mcpServers"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-    </span><span class="nl">"quarkus-officehours-mcp"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-      </span><span class="nl">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"java"</span><span class="p">,</span><span class="w">
-      </span><span class="nl">"args"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
-        </span><span class="s2">"-jar"</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"&lt;path-to-jar&gt;/officehours-mcp-1.0-SNAPSHOT-runner.jar"</span><span class="w">
-      </span><span class="p">]</span><span class="w">
-    </span><span class="p">}</span><span class="w">
-  </span><span class="p">}</span><span class="w">
-</span><span class="p">}</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Beim Öffnen von Claude Desktop wird nun die JAR gestartet und der MCP-Client hängt sich in die STDIO-Console.
-Zusätzliche Dienste wie die Datenbank müssen extra gestartet werden, deshalb ist diese Art der Kommunikation (STDIO) eher zum Entwickeln gedacht.</p>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_claude_ai_mit_mcp_server_verbinden_sse"><a class="anchor" href="#_claude_ai_mit_mcp_server_verbinden_sse"></a>3.7. Claude AI mit MCP-Server verbinden (SSE)</h3>
-<div class="paragraph">
-<p>Voraussetzung ist ein über HTTP(S) erreichbarer Quarkus-MCP-Server.
-Ob dieser deployed wurde, lokal als JAR, nativ oder im Dev Mode läuft, spielt hierbei keine Rolle.</p>
-</div>
-<div class="sect3">
-<h4 id="_claude_konfigurationsdatei_2"><a class="anchor" href="#_claude_konfigurationsdatei_2"></a>3.7.1. Claude-Konfigurationsdatei</h4>
-<div class="ulist">
-<ul>
-<li>
-<p>Claude Desktop: Hamburger-Menu &gt; File &gt; Settings</p>
-</li>
-<li>
-<p>Settings: Developer &gt; Edit Config</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>Der File-Explorer öffnet sich und markiert die Konfigurationsdatei <code>claude_desktop_config.json</code>.
-Diese um folgende Einträge erweitern:</p>
-</div>
-<div class="listingblock">
-<div class="title">claude_desktop_config.json</div>
-<div class="content">
-<pre class="rouge highlight"><code data-lang="json"><span class="p">{</span><span class="w">
-  </span><span class="nl">"mcpServers"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-    </span><span class="nl">"quarkus-officehours-mcp"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-      </span><span class="nl">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"npx"</span><span class="p">,</span><span class="w">
-      </span><span class="nl">"args"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
-        </span><span class="s2">"mcp-remote"</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"http://localhost:8080/mcp/sse"</span><span class="w">
-      </span><span class="p">]</span><span class="w">
-    </span><span class="p">}</span><span class="w">
-  </span><span class="p">}</span><span class="w">
-</span><span class="p">}</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p><code>npx</code> ist ein Tool, um Befehle eines npm-Packages direkt auszuführen, ohne dass das npm-Package installiert werden muss.</p>
-</div>
-<div class="paragraph">
-<p><code>mcp-remote</code> ist ein npm-Package, welches erlaubt, MCP-Protokolle über SSE laufen zu lassen.</p>
-</div>
-<div class="paragraph">
-<p>Die Adresse des MCP-Servers muss angegeben werden. Der Pfad zur Kommunikation mit <code>JSON-RPC</code> ist standardmäßig <code>/mcp/sse</code>.</p>
-</div>
-<div class="admonitionblock important">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-important" title="Important"></i>
-</td>
-<td class="content">
-Bei Linux wird trotz Beenden von Claude Desktop manchmal der npx-Prozess nicht beendet und die MCP-Schnittstelle wird blockiert, deswegen ist ein manuelles Beenden notwendig. Dies geschieht mit:
-</td>
-</tr>
-</table>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="bash"><span class="nb">sudo </span>lsof <span class="nt">-i</span> :3334
-<span class="nb">kill</span> <span class="nt">-9</span> &lt;pid&gt;</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_wissen_benutzen"><a class="anchor" href="#_wissen_benutzen"></a>3.8. Wissen benutzen</h3>
-<div class="paragraph">
-<p>Das Hammer-Symbol unter der Prompt-Eingabe in Claude Desktop öffnet ein Popup, wo alle verfügbaren Tools angezeigt werden.</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="images/claude-mcp-viewer.png" alt="claude mcp viewer">
-</div>
-</div>
-<div class="paragraph">
-<p>Das Prompten kann nun losgehen :-)</p>
-</div>
-<div class="quoteblock">
-<blockquote>
-Welcher Lehrkräfte arbeiten an der HTL Leonding?
-</blockquote>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="images/claude-allteachers.png" alt="claude allteachers">
-</div>
-</div>
-<div class="quoteblock">
-<blockquote>
-Wann hat Herr Thomas Stütz Sprechstunde?
-</blockquote>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="images/claude-officehours.png" alt="claude officehours">
-</div>
-</div>
-<div class="quoteblock">
-<blockquote>
-Wer sitzt gemeinsam mit Herrn Thomas Stütz noch im Büro?
-</blockquote>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="images/claude-teachers-room.png" alt="claude teachers room">
-</div>
+<span class="c"># drop and create the database at startup (use `update` to only update the schema)
+</span><span class="py">quarkus.hibernate-orm.database.generation</span><span class="p">=</span><span class="s">drop-and-create</span></code></pre>
 </div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_glossar"><a class="anchor" href="#_glossar"></a>4. Glossar</h2>
+<h2 id="_jdbc_treiber_hinzufügen"><a class="anchor" href="#_jdbc_treiber_hinzufügen"></a>4. JDBC-Treiber hinzufügen</h2>
 <div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p><strong>LLM</strong>: Large Language Model</p>
-<div class="ulist">
-<ul>
-<li>
-<p>KI-Modell, das Sprache versteht und generiert</p>
-</li>
-<li>
-<p>z.B. für Chatbots, Textübersetzungen oder Code-Vervollständigung</p>
-</li>
-<li>
-<p>Beispiele: ChatGPT, Claude, Gemini.</p>
-</li>
-</ul>
+<div class="listingblock">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="xml"><span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>io.quarkus<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>quarkus-jdbc-postgresql<span class="nt">&lt;/artifactId&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span></code></pre>
 </div>
-</li>
-<li>
-<p><strong>Anthropic</strong></p>
-<div class="ulist">
-<ul>
-<li>
-<p>US-amerikanisches KI-Unternehmen, 2021 von ehemaligen OpenAI-Mitarbeitern gegründet</p>
-</li>
-</ul>
 </div>
-</li>
-<li>
-<p><strong>Claude AI</strong></p>
-<div class="ulist">
-<ul>
-<li>
-<p>von Anthropic entwickelter KI-Chatbot</p>
-</li>
-</ul>
+<div class="paragraph">
+<p>oder</p>
 </div>
-</li>
-</ul>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">./mvnw quarkus:add-extension <span class="nt">-Dextensions</span><span class="o">=</span><span class="s2">"io.quarkus:quarkus-jdbc-postgresql"</span></code></pre>
 </div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_hibernate_orm_mit_panache_hinzufügen"><a class="anchor" href="#_hibernate_orm_mit_panache_hinzufügen"></a>5. Hibernate ORM mit Panache hinzufügen</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="xml"><span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>io.quarkus<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>quarkus-hibernate-orm-panache<span class="nt">&lt;/artifactId&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>oder</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">./mvnw quarkus:add-extension <span class="nt">-Dextensions</span><span class="o">=</span><span class="s2">"io.quarkus:quarkus-hibernate-orm-panache"</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_läuft_nun_ist_es_möglich_mittels_panache_jpa_entities_in_der_postgresql_datenbank_zu_persistieren"><a class="anchor" href="#_läuft_nun_ist_es_möglich_mittels_panache_jpa_entities_in_der_postgresql_datenbank_zu_persistieren"></a>6. Läuft. Nun ist es möglich mittels Panache JPA Entities in der PostgreSQL-Datenbank zu persistieren</h2>
+<div class="sectionbody">
+
 </div>
 </div>
 </div>
