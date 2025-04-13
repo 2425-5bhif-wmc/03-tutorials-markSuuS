@@ -800,7 +800,7 @@ Deren Implementierung ist einfacher als die Implementierung von REST-Endpoints, 
 </div>
 </div>
 <div class="paragraph">
-<p>In diesem Stück Source Code gibt es 3 Methoden:</p>
+<p>In der Klasse <code>McpTools</code> gibt es 3 Tools:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -911,24 +911,31 @@ Diese um folgende Einträge erweitern:</p>
 <pre class="rouge highlight"><code data-lang="json"><span class="p">{</span><span class="w">
   </span><span class="nl">"mcpServers"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
     </span><span class="nl">"quarkus-officehours-mcp"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-      </span><span class="nl">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"npx"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"npx"</span><span class="p">,</span><span class="w"> <i class="conum" data-value="1"></i><b>(1)</b>
       </span><span class="nl">"args"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
-        </span><span class="s2">"mcp-remote"</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"http://localhost:8080/mcp/sse"</span><span class="w">
+        </span><span class="s2">"mcp-remote"</span><span class="p">,</span><span class="w"> <i class="conum" data-value="2"></i><b>(2)</b>
+        </span><span class="s2">"http://localhost:8080/mcp/sse"</span><span class="w"> <i class="conum" data-value="3"></i><b>(3)</b>
       </span><span class="p">]</span><span class="w">
     </span><span class="p">}</span><span class="w">
   </span><span class="p">}</span><span class="w">
 </span><span class="p">}</span></code></pre>
 </div>
 </div>
-<div class="paragraph">
-<p><code>npx</code> ist ein Tool, um Befehle eines npm-Packages direkt auszuführen, ohne dass das npm-Package initialisiert werden muss.</p>
-</div>
-<div class="paragraph">
-<p><code>mcp-remote</code> ist ein npm-Package, welches erlaubt, MCP-Protokolle über SSE laufen zu lassen.</p>
-</div>
-<div class="paragraph">
-<p>Die Adresse des MCP-Servers muss angegeben werden. Der Pfad ist standardmäßig <code>/mcp/sse</code>.</p>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>npx</code> ist ein Tool, um Befehle eines npm-Packages direkt auszuführen, ohne dass das npm-Package initialisiert werden muss.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>mcp-remote</code> ist ein npm-Package, welches erlaubt, MCP-Protokolle über SSE laufen zu lassen.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Die Adresse des MCP-Servers muss angegeben werden. Der Pfad ist standardmäßig <code>/mcp/sse</code>.</td>
+</tr>
+</table>
 </div>
 <div class="admonitionblock important">
 <table>
@@ -1044,7 +1051,7 @@ Wer sitzt gemeinsam mit Herrn Thomas Stütz noch im Büro?
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-04-13 10:52:52 UTC
+Last updated 2025-04-13 11:42:02 UTC
 </div>
 </div>
 </body>
