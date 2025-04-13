@@ -20,9 +20,9 @@ image::mcp.png[]
 
 1. Die Grundlage aller Datenbestände bildet eine zentrale Datenbank.
 2. Eine spezialisierte Anwendung dient als Schnittstelle: Sie verfügt einerseits über Zugriff auf diese Datenbank und stellt andererseits die darin enthaltenen Informationen über das MCP-Protokoll zur Verfügung.
-3. Der Nutzer interagiert über einen LLM-Client (z.B. Claude AI). Das LLM hat Zugriff auf die verschiedenen MCP-Interfaces (die sogennanten Tools) der Anwendungen und identifiziert anhand der gestellten Anfrage das am besten geeignete Interface.
+3. Der Nutzer interagiert über einen LLM-Client (z.B. Claude AI). Das LLM hat Zugriff auf die verschiedenen MCP-Interfaces (die sogennanten Tools) der Anwendungen und identifiziert anhand der gestellten Anfrage das am besten geeignete Tool.
 4. Anschließend stellt es eine Abfrage an dieses Tool – gegebenenfalls unter Angabe von Parametern.
-5. Je nach implementierter Logik liefert das angesprochene MCP-Interface die angeforderten Daten an den LLM-Client zurück.
+5. Je nach implementierter Logik liefert das aufgerufene MCP-Tool die angeforderten Daten an den LLM-Client zurück.
 6. Auf Basis dieser Daten generiert das LLM eine passende Antwort.
 
 Das MCP-Protokoll basiert auf `JSON-RPC`. Die Kommunikation kann dabei auf zwei Arten erfolgen:
@@ -208,7 +208,7 @@ Diese um folgende Einträge erweitern:
 ----
 `npx` ist ein Tool, um Befehle eines npm-Packages direkt auszuführen, ohne dass das npm-Package installiert werden muss.
 
-`mcp-remote` ist ein npm-Package, welches erlaubt, MCP-Protokolle über HTTP(S) laufen zu lassen.
+`mcp-remote` ist ein npm-Package, welches erlaubt, MCP-Protokolle über SSE laufen zu lassen.
 
 Die Adresse des MCP-Servers muss angegeben werden. Der Pfad zur Kommunikation mit `JSON-RPC` ist standardmäßig `/mcp/sse`.
 
