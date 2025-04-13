@@ -1,4 +1,4 @@
-= Basisprojekt MCP-Server
+= Basisprojekt des MCP-Servers für die Sprechstundenliste
 :toc:
 ifndef::imagesdir[:imagesdir: images]
 :icons: font

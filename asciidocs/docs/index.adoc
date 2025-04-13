@@ -10,7 +10,7 @@ ifndef::imagesdir[:imagesdir: images]
 == Einführung
 
 Anthropic hat ein neues offenes Protokoll namens Model Context Protocol (MCP) vorgestellt. Die Idee dahinter: KI-Assistenten sollen viel einfacher auf externe Datenquellen oder sogar komplette Apps zugreifen können – und zwar sicher, flexibel und effizient.
-Mit MCP können Entwickler entweder ihre Daten für KI-Systeme „bereitstellen“ oder Tools bauen, die diese Daten über standardisierte Schnittstellen abrufen.
+Mit MCP können Entwickler entweder ihre Daten für KI-Systeme „bereitstellen“ (Zugriff auf Filesystem) oder Tools bauen (Zugriff über Applikation mit MCP-Interface), die diese Daten über standardisierte Schnittstellen abrufen.
 Anthropic's Claude AI ist dabei das erste LLM, dass die Integration von MCP-Servern in deren Chatbot erlaubt.
 Ein MCP-Server kann unter anderem auch in Quarkus oder Spring Boot implementiert werden.
 
@@ -52,7 +52,7 @@ NOTE: Claude Desktop installieren und sich registrieren. Beim Repackaging-Downlo
 === Basisprojekt
 Als Basisprojekt wird ein Quarkus-Projekt genommen, welches mittels JDBC und Panache an eine PostgreSQL-Datenbank angebunden ist.
 Die in der CSV-Datei liegende Sprechstundenliste wird normalisiert und in die Datenbank gespielt.
-Mehr dazu: *TODO*
+Mehr dazu: link:base-project.adoc[Basisprojekt des MCP-Servers für die Sprechstundenliste]
 
 === Maven-Dependency
 Nun folgt die Entscheidung, ob die Kommunikation über STDIO oder SSE ablaufen soll.
