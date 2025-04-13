@@ -130,7 +130,7 @@ In diesem Stück Source Code gibt es 3 Methoden:
 
 `@Tool(description = "...")` ist dabei die Beschreibung des Tools als Fließtext. Das LLM vergleicht den vom User eingegebenen Prompt mit allen Beschreibungen und wählt jenes Tool, wo die Beschreibung mit dem Prompt zusammenpasst.
 
-`@ToolArg(description = "...")` ist dabei ein Parameter, welcher vom LLM aus dem Prompt des Users extrahiert werden und in der Methode verwendet werden kann.
+`@ToolArg(description = "...")` ist dabei ein Parameter, welcher vom LLM aus dem Prompt des Users extrahiert wird und in der Methode verwendet werden kann.
 
 === Claude AI mit MCP-Server verbinden (STDIO)
 
@@ -181,7 +181,6 @@ Zusätzliche Dienste wie die Datenbank müssen extra gestartet werden, deshalb i
 
 === Claude AI mit MCP-Server verbinden (SSE)
 Voraussetzung ist ein über HTTP(S) erreichbarer Quarkus-MCP-Server.
-Ob dieser deployed wurde, lokal als JAR, nativ oder im Dev Mode läuft, spielt hierbei keine Rolle.
 
 ==== Claude-Konfigurationsdatei
 
@@ -206,13 +205,13 @@ Diese um folgende Einträge erweitern:
   }
 }
 ----
-`npx` ist ein Tool, um Befehle eines npm-Packages direkt auszuführen, ohne dass das npm-Package installiert werden muss.
+`npx` ist ein Tool, um Befehle eines npm-Packages direkt auszuführen, ohne dass das npm-Package initialisiert werden muss.
 
 `mcp-remote` ist ein npm-Package, welches erlaubt, MCP-Protokolle über SSE laufen zu lassen.
 
-Die Adresse des MCP-Servers muss angegeben werden. Der Pfad zur Kommunikation mit `JSON-RPC` ist standardmäßig `/mcp/sse`.
+Die Adresse des MCP-Servers muss angegeben werden. Der Pfad ist standardmäßig `/mcp/sse`.
 
-IMPORTANT: Bei Linux wird trotz Beenden von Claude Desktop manchmal der npx-Prozess nicht beendet und die MCP-Schnittstelle wird blockiert, deswegen ist ein manuelles Beenden notwendig. Dies geschieht mit:
+IMPORTANT: Bei Linux wird trotz Beenden von Claude Desktop manchmal der npx-Prozess nicht beendet und die MCP-Schnittstelle blockiert, deswegen ist ein manuelles Beenden notwendig. Dies geschieht mit:
 
 [source, bash]
 ----

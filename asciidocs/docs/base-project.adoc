@@ -145,6 +145,7 @@ public class OfficeHour {
 
 Die Repositories werden mit Panache implementiert:
 Der Rückgabetyp aller Abfragen ist `String`, da die MCP-Tools nur damit kompatibel sind.
+JPAStreamer wurde verwendet, um JPA-Queries als Streams auszudrücken.
 
 [%collapsible]
 ====
@@ -285,6 +286,8 @@ public class DayOfWeekParser {
 }
 
 ----
+
+Beim Hochfahren der Applikation wird `readCsvAndInsert` aufgerufen, welche die CSV-Daten einliest, normalisiert und in die Datenbank speichert.
 
 .InsertBean.java
 [source, java]

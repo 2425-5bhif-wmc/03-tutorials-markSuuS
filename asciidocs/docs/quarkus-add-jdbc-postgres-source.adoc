@@ -88,4 +88,4 @@ oder
 ./mvnw quarkus:add-extension -Dextensions="io.quarkus:quarkus-hibernate-orm-panache"
 ----
 
-== Läuft. Nun ist es möglich mittels Panache JPA Entities in der PostgreSQL-Datenbank zu persistieren
+Läuft. Nun ist es möglich mittels Panache JPA Entities in der PostgreSQL-Datenbank zu persistieren
