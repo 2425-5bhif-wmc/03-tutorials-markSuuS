@@ -52,7 +52,7 @@ NOTE: Claude Desktop installieren und sich registrieren. Beim Repackaging-Downlo
 === Basisprojekt
 Als Basisprojekt wird ein Quarkus-Projekt genommen, welches mittels JDBC und Panache an eine PostgreSQL-Datenbank angebunden ist.
 Die in der CSV-Datei liegende Sprechstundenliste wird normalisiert und in die Datenbank gespielt.
-Mehr dazu: link:base-project.adoc[Basisprojekt des MCP-Servers für die Sprechstundenliste]
+Mehr dazu: link:base-project[Basisprojekt des MCP-Servers für die Sprechstundenliste]
 
 === Maven-Dependency
 Nun folgt die Entscheidung, ob die Kommunikation über STDIO oder SSE ablaufen soll.

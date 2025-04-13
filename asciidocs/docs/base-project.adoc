@@ -43,7 +43,7 @@ NOTE: Das Hinzufügen der Dependency für die MCP-Kommunikation erfolgt zu einem
 
 == JDBC Datasource hinzufügen
 
-Mehr dazu: link:quarkus-add-jdbc-postgres-source.adoc[Quarkus: JDBC Datasource hinzufügen]
+Mehr dazu: link:quarkus-add-jdbc-postgres-source[Quarkus: JDBC Datasource hinzufügen]
 
 == Entities
 
