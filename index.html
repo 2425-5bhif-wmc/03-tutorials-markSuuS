@@ -819,7 +819,7 @@ Deren Implementierung ist einfacher als die Implementierung von REST-Endpoints, 
 <p><code>@Tool(description = "&#8230;&#8203;")</code> ist dabei die Beschreibung des Tools als Fließtext. Das LLM vergleicht den vom User eingegebenen Prompt mit allen Beschreibungen und wählt jenes Tool, wo die Beschreibung mit dem Prompt zusammenpasst.</p>
 </div>
 <div class="paragraph">
-<p><code>@ToolArg(description = "&#8230;&#8203;")</code> ist dabei ein Parameter, welcher vom LLM aus dem Prompt des Users extrahiert werden und in der Methode verwendet werden kann.</p>
+<p><code>@ToolArg(description = "&#8230;&#8203;")</code> ist dabei ein Parameter, welcher vom LLM aus dem Prompt des Users extrahiert wird und in der Methode verwendet werden kann.</p>
 </div>
 </div>
 <div class="sect2">
@@ -887,8 +887,7 @@ Zusätzliche Dienste wie die Datenbank müssen extra gestartet werden, deshalb i
 <div class="sect2">
 <h3 id="_claude_ai_mit_mcp_server_verbinden_sse"><a class="anchor" href="#_claude_ai_mit_mcp_server_verbinden_sse"></a>3.7. Claude AI mit MCP-Server verbinden (SSE)</h3>
 <div class="paragraph">
-<p>Voraussetzung ist ein über HTTP(S) erreichbarer Quarkus-MCP-Server.
-Ob dieser deployed wurde, lokal als JAR, nativ oder im Dev Mode läuft, spielt hierbei keine Rolle.</p>
+<p>Voraussetzung ist ein über HTTP(S) erreichbarer Quarkus-MCP-Server.</p>
 </div>
 <div class="sect3">
 <h4 id="_claude_konfigurationsdatei_2"><a class="anchor" href="#_claude_konfigurationsdatei_2"></a>3.7.1. Claude-Konfigurationsdatei</h4>
@@ -923,13 +922,13 @@ Diese um folgende Einträge erweitern:</p>
 </div>
 </div>
 <div class="paragraph">
-<p><code>npx</code> ist ein Tool, um Befehle eines npm-Packages direkt auszuführen, ohne dass das npm-Package installiert werden muss.</p>
+<p><code>npx</code> ist ein Tool, um Befehle eines npm-Packages direkt auszuführen, ohne dass das npm-Package initialisiert werden muss.</p>
 </div>
 <div class="paragraph">
 <p><code>mcp-remote</code> ist ein npm-Package, welches erlaubt, MCP-Protokolle über SSE laufen zu lassen.</p>
 </div>
 <div class="paragraph">
-<p>Die Adresse des MCP-Servers muss angegeben werden. Der Pfad zur Kommunikation mit <code>JSON-RPC</code> ist standardmäßig <code>/mcp/sse</code>.</p>
+<p>Die Adresse des MCP-Servers muss angegeben werden. Der Pfad ist standardmäßig <code>/mcp/sse</code>.</p>
 </div>
 <div class="admonitionblock important">
 <table>
@@ -938,7 +937,7 @@ Diese um folgende Einträge erweitern:</p>
 <i class="fa icon-important" title="Important"></i>
 </td>
 <td class="content">
-Bei Linux wird trotz Beenden von Claude Desktop manchmal der npx-Prozess nicht beendet und die MCP-Schnittstelle wird blockiert, deswegen ist ein manuelles Beenden notwendig. Dies geschieht mit:
+Bei Linux wird trotz Beenden von Claude Desktop manchmal der npx-Prozess nicht beendet und die MCP-Schnittstelle blockiert, deswegen ist ein manuelles Beenden notwendig. Dies geschieht mit:
 </td>
 </tr>
 </table>
@@ -1045,7 +1044,7 @@ Wer sitzt gemeinsam mit Herrn Thomas Stütz noch im Büro?
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-04-13 10:43:01 UTC
+Last updated 2025-04-13 10:52:52 UTC
 </div>
 </div>
 </body>

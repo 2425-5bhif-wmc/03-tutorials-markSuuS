@@ -738,7 +738,8 @@ Das Hinzufügen der Dependency für die MCP-Kommunikation erfolgt zu einem spät
 <div class="sectionbody">
 <div class="paragraph">
 <p>Die Repositories werden mit Panache implementiert:
-Der Rückgabetyp aller Abfragen ist <code>String</code>, da die MCP-Tools nur damit kompatibel sind.</p>
+Der Rückgabetyp aller Abfragen ist <code>String</code>, da die MCP-Tools nur damit kompatibel sind.
+JPAStreamer wurde verwendet, um JPA-Queries als Streams auszudrücken.</p>
 </div>
 <details>
 <summary class="title">Details</summary>
@@ -905,6 +906,9 @@ Bodenstorfer Bernhard	Nach Vereinbarung!		0 - 0. EH</code></pre>
 <span class="o">}</span></code></pre>
 </div>
 </div>
+<div class="paragraph">
+<p>Beim Hochfahren der Applikation wird <code>readCsvAndInsert</code> aufgerufen, welche die CSV-Daten einliest, normalisiert und in die Datenbank speichert.</p>
+</div>
 <div class="listingblock">
 <div class="title">InsertBean.java</div>
 <div class="content">
@@ -992,7 +996,7 @@ Bodenstorfer Bernhard	Nach Vereinbarung!		0 - 0. EH</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-04-13 10:43:01 UTC
+Last updated 2025-04-13 10:52:52 UTC
 </div>
 </div>
 </body>
